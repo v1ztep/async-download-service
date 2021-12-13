@@ -1,12 +1,18 @@
 import asyncio
+import os
 
 import aiofiles
+import aiohttp.web
 from aiohttp import web
 
 
 async def archivate(request):
     zip_args = ['zip', '-r', '-', '.']
     folder = request.match_info.get('archive_hash')
+    if not os.path.exists(f'photos/{folder}'):
+        raise aiohttp.web.HTTPNotFound(
+            text='Архив не существует или был удален'
+        )
     response = web.StreamResponse()
     response.headers['Content-Disposition'] = 'attachment; ' \
                                               'filename="archive.zip"'
@@ -14,7 +20,7 @@ async def archivate(request):
 
     subprocess = await asyncio.create_subprocess_exec(
         *zip_args,
-        cwd=f'test_photos/{folder}',
+        cwd=f'photos/{folder}',
         stdout=asyncio.subprocess.PIPE
     )
 
