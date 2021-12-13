@@ -1,10 +1,11 @@
 import asyncio
 
 
-async def archivate(folder='photos/', filename='archive.zip'):
-    zip_args = f'-r - {folder}' # экранировать https://docs.python.org/3.7/library/shlex.html#shlex.quote
-    subprocess = await asyncio.create_subprocess_shell(
-        f'zip {zip_args}',
+async def archivate(folder='test/', filename='archive.zip'):
+    zip_args = ['zip', '-r', '-', '.']
+    subprocess = await asyncio.create_subprocess_exec(
+        *zip_args,
+        cwd=folder,
         stdout=asyncio.subprocess.PIPE
     )
     while True:
