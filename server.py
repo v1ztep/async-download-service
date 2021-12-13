@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 
 import aiofiles
@@ -21,11 +22,13 @@ async def archivate(request):
     subprocess = await asyncio.create_subprocess_exec(
         *zip_args,
         cwd=f'photos/{folder}',
-        stdout=asyncio.subprocess.PIPE
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
     )
 
     while True:
         stdout = await subprocess.stdout.read(n=512000)
+        logging.debug(u'Sending archive chunk ...')
         if subprocess.stdout.at_eof():
             return response
 
@@ -41,6 +44,7 @@ async def handle_index_page(request):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     app = web.Application()
     app.add_routes([
         web.get('/', handle_index_page),
