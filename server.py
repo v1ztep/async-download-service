@@ -44,6 +44,7 @@ async def archivate(request):
     finally:
         if subprocess.returncode is None:
             subprocess.kill()
+            outs, errs = await subprocess.communicate()
         return response
 
 
@@ -56,7 +57,7 @@ async def handle_index_page(request):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     app = web.Application()
     app.add_routes([
         web.get('/', handle_index_page),
